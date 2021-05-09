@@ -31,7 +31,7 @@
                                     completion:(void (^)(NSArray *, NSError *))completionHandler;
 
 - (void)fetchElectrocardiogramSamples:(HKSampleType *)quantityType
-                                 full:(BOOL)full
+                                 withMeasurements:(BOOL)withMeasurements
                                  unit:(HKUnit *)unit
                             predicate:(NSPredicate *)predicate
                             ascending:(BOOL)asc

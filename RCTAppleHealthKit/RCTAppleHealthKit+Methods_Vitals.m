@@ -16,7 +16,7 @@
 {
     HKSampleType *electrocardiogramType = [HKSampleType electrocardiogramType];
 
-    BOOL full = [RCTAppleHealthKit hkUnitFromOptions:input key:@"full" withDefault:false];
+    BOOL withMeasurements = [RCTAppleHealthKit boolFromOptions:input key:@"withMeasurements" withDefault:false];
     HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:[HKUnit voltUnit]];
     NSUInteger limit = [RCTAppleHealthKit uintFromOptions:input key:@"limit" withDefault:HKObjectQueryNoLimit];
     BOOL ascending = [RCTAppleHealthKit boolFromOptions:input key:@"ascending" withDefault:false];
@@ -29,7 +29,7 @@
     NSPredicate * predicate = [RCTAppleHealthKit predicateForSamplesBetweenDates:startDate endDate:endDate];
 
     [self fetchElectrocardiogramSamples:electrocardiogramType
-                                   full:full
+                                   withMeasurements:withMeasurements
                                    unit:unit
                            predicate:predicate
                            ascending:ascending

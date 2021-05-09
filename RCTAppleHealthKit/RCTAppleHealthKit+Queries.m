@@ -110,7 +110,7 @@
 }
 
 - (void)fetchElectrocardiogramSamples:(HKSampleType *)type
-                                 full:(bool)full
+                     withMeasurements:(bool)withMeasurements
                                  unit:(HKUnit *)unit
                             predicate:(NSPredicate *)predicate
                             ascending:(BOOL)asc
@@ -139,7 +139,7 @@
                 if (type == [HKObjectType electrocardiogramType]) {
                 
                     for(HKElectrocardiogram *sample in results) {
-                        if(full) {
+                        if(withMeasurements) {
                             NSMutableArray *measurements = [NSMutableArray arrayWithCapacity:1];
                             HKElectrocardiogramQuery *query = [[HKElectrocardiogramQuery alloc] initWithElectrocardiogram:sample dataHandler: ^(HKElectrocardiogramQuery *query, HKElectrocardiogramVoltageMeasurement *voltageMeasurement, BOOL done, NSError *electrocardiogramError) {
                                 HKQuantity *reading = [voltageMeasurement quantityForLead:(HKElectrocardiogramLeadAppleWatchSimilarToLeadI)];
