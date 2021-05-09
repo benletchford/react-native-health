@@ -4,6 +4,7 @@
  * @type {Object}
  */
 export const Permissions = {
+  Electrocardiogram: 'Electrocardiogram',
   ActiveEnergyBurned: 'ActiveEnergyBurned',
   AppleExerciseTime: 'AppleExerciseTime',
   AppleStandTime: 'AppleStandTime',

@@ -30,6 +30,14 @@
                                        endDate:(NSDate *)endDate
                                     completion:(void (^)(NSArray *, NSError *))completionHandler;
 
+- (void)fetchElectrocardiogramSamples:(HKSampleType *)quantityType
+                                 full:(BOOL)full
+                                 unit:(HKUnit *)unit
+                            predicate:(NSPredicate *)predicate
+                            ascending:(BOOL)asc
+                                limit:(NSUInteger)lim
+                           completion:(void (^)(NSArray *, NSError *))completion;
+
 - (void)fetchSamplesOfType:(HKSampleType *)quantityType
                               unit:(HKUnit *)unit
                          predicate:(NSPredicate *)predicate

@@ -147,7 +147,9 @@
     }
 
     // Vital Signs Identifiers
-    if ([@"HeartRate" isEqualToString: key]) {
+    if ([@"Electrocardiogram" isEqualToString: key]) {
+        return [HKObjectType electrocardiogramType];
+    } else if ([@"HeartRate" isEqualToString: key]) {
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
     } else if ([@"WalkingHeartRateAverage" isEqualToString: key]) {
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingHeartRateAverage];

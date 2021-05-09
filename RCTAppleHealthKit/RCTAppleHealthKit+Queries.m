@@ -109,6 +109,96 @@
     [self.healthStore executeQuery:query];
 }
 
+- (void)fetchElectrocardiogramSamples:(HKSampleType *)type
+                                 full:(bool)full
+                                 unit:(HKUnit *)unit
+                            predicate:(NSPredicate *)predicate
+                            ascending:(BOOL)asc
+                                limit:(NSUInteger)lim
+                           completion:(void (^)(NSArray *, NSError *))completion {
+    
+    NSSortDescriptor *timeSortDescriptor = [[NSSortDescriptor alloc] initWithKey:HKSampleSortIdentifierEndDate
+          ascending:asc];
+    
+    // declare the block
+    void (^handlerBlock)(HKSampleQuery *query, NSArray *results, NSError *error);
+
+    // create and assign the block
+    handlerBlock = ^(HKSampleQuery *query, NSArray *results, NSError *error) {
+        if (!results) {
+            if (completion) {
+                completion(nil, error);
+            }
+            return;
+        }
+
+        if (completion) {
+            NSMutableArray *data = [NSMutableArray arrayWithCapacity:1];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (type == [HKObjectType electrocardiogramType]) {
+                
+                    for(HKElectrocardiogram *sample in results) {
+                        if(full) {
+                            NSMutableArray *measurements = [NSMutableArray arrayWithCapacity:1];
+                            HKElectrocardiogramQuery *query = [[HKElectrocardiogramQuery alloc] initWithElectrocardiogram:sample dataHandler: ^(HKElectrocardiogramQuery *query, HKElectrocardiogramVoltageMeasurement *voltageMeasurement, BOOL done, NSError *electrocardiogramError) {
+                                HKQuantity *reading = [voltageMeasurement quantityForLead:(HKElectrocardiogramLeadAppleWatchSimilarToLeadI)];
+                                
+                                NSDictionary *measurement = @{
+                                    @"timeSinceSampleStart" : @(voltageMeasurement.timeSinceSampleStart),
+                                    @"voltage": @([reading doubleValueForUnit:HKUnit.voltUnit])
+                                };
+                                [measurements addObject:measurement];
+                                
+                                if(done) {
+                                    NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
+                                    NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
+                                    
+                                    NSDictionary *elem = @{
+                                                           @"start" : startDateString,
+                                                           @"end" : endDateString,
+                                                           @"measurements": measurements
+                                                        };
+                                    
+                                    [data addObject:elem];
+                                    
+                                    if ([results lastObject] == sample) {
+                                        completion(data, error);
+                                    }
+                                }
+                            }];
+                            
+                            [self.healthStore executeQuery:query];
+                        } else {
+                            NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
+                            NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
+                            
+                            NSDictionary *elem = @{
+                                                   @"start" : startDateString,
+                                                   @"end" : endDateString,
+                                                };
+                            
+                            [data addObject:elem];
+                            
+                            if ([results lastObject] == sample) {
+                                completion(data, error);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    };
+    
+    HKSampleQuery *query = [[HKSampleQuery alloc] initWithSampleType:type
+                                                           predicate:predicate
+                                                               limit:lim
+                                                     sortDescriptors:@[timeSortDescriptor]
+                                                      resultsHandler:handlerBlock];
+
+    [self.healthStore executeQuery:query];
+}
+
 - (void)fetchSamplesOfType:(HKSampleType *)type
                       unit:(HKUnit *)unit
                  predicate:(NSPredicate *)predicate
